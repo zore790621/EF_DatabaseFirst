@@ -48,17 +48,19 @@ namespace EF_Database_MVC.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ProductEdit([Bind(Include = "ProductID,ProductName,SupplierID,CategoryID,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Product product)
+        public ActionResult ProductEdit([Bind(Include = "Id,Name,Price,UnitsInStock")] ProductView p)
         {
             if (ModelState.IsValid)
             {
+                Product product = db.Products.Find(p.Id);
+                product.ProductName = p.Name;
+                product.UnitPrice = p.Price;
+                product.UnitsInStock = (short?)p.UnitsInStock;
                 db.Entry(product).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", product.CategoryID);
-            ViewBag.SupplierID = new SelectList(db.Suppliers, "SupplierID", "CompanyName", product.SupplierID);
-            return View(product);
+            return View(p);
         }
     }
 }
